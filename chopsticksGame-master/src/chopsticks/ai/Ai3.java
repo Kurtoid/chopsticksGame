@@ -38,7 +38,7 @@ public class Ai3 {
 	}
 
 	public static int minimax(Game g, int depth, boolean isComputer) {
-		if (GameOver(g) || depth == 6) {
+		if (GameOver(g) || depth ==8) {
 			return evaluate(g, depth);
 		}
 		depth++;
@@ -87,8 +87,9 @@ public class Ai3 {
 			return 10 - depth;
 		} else if (g.player.left + g.player.right < 1) {
 			return depth - 10;
-		} else if ((g.player.left + g.player.right == 4)){ return -5;}
-		 else return 0;
+		} else if ((g.player.left + g.player.right == 4)) {
+			return -5;
+		} else return 0;
 	}
 
 	public static ArrayList<Move> GenerateMoves(Game g) {
@@ -106,59 +107,104 @@ public class Ai3 {
 			moves.add(new Move(true, true));
 		}
 
+		// swaps
+		if (g.computer.right == 3 && g.computer.left == 1) {
+			moves.add(new Move(false, false, 1));
+		}
+		if (g.computer.right == 1 && g.computer.left == 3) {
+			moves.add(new Move(true, false, 1));
+		}
+		if (g.computer.right == 4 && g.computer.left == 2) {
+			moves.add(new Move(false, false, 1));
+		}
+		if (g.computer.right == 2 && g.computer.left == 4) {
+			moves.add(new Move(true, false, 1));
+		}
+		if (g.computer.right == 4 && g.computer.left == 1) {
+			moves.add(new Move(false, false, 2));
+		}
+		if (g.computer.right == 1 && g.computer.left == 4) {
+			moves.add(new Move(true, false, 2));
+		}
 		return moves;
 	}
 
 	public static Game ApplyMove(Move m, Game g, boolean isComputer) {
-		if (isComputer) {
-			if (m.cRight) {
-				if (m.pRight) {
-					g.computer.right += g.player.right;
+		if (m.swapNum != 0) {
+			System.out.println("sim a attack!");
+			if (isComputer) {
+				if (m.cRight) {
+					if (m.pRight) {
+						g.computer.right += g.player.right;
+					} else {
+						g.computer.right += g.player.left;
+					}
 				} else {
-					g.computer.right += g.player.left;
+					if (m.pRight) {
+						g.computer.left += g.player.right;
+					} else {
+						g.computer.left += g.player.left;
+					}
 				}
 			} else {
-				if (m.pRight) {
-					g.computer.left += g.player.right;
+				if (m.cRight) {
+					if (m.pRight) {
+						g.player.right += g.computer.right;
+					} else {
+						g.player.right += g.computer.left;
+					}
 				} else {
-					g.computer.left += g.player.left;
+					if (m.pRight) {
+						g.player.left += g.computer.right;
+					} else {
+						g.player.left += g.computer.left;
+					}
 				}
+
+
 			}
 		} else {
-			if (m.cRight) {
-				if (m.pRight) {
-					g.player.right += g.computer.right;
-				} else {
-					g.player.right += g.computer.left;
+			System.out.println("sim a swap!");
+			if (isComputer) {
+				if (m.cRight) {
+					g.computer.left-=m.swapNum;
+					g.computer.right+=m.swapNum;
+
+				}else{
+					g.computer.right-=m.swapNum;
+					g.computer.left+=m.swapNum;
+
 				}
-			} else {
-				if (m.pRight) {
-					g.player.left += g.computer.right;
-				} else {
-					g.player.left += g.computer.left;
+			}else{
+				if (m.cRight) {
+					g.player.left-=m.swapNum;
+					g.player.right+=m.swapNum;
+
+				}else{
+					g.player.right-=m.swapNum;
+					g.player.left+=m.swapNum;
+
 				}
 			}
-			if (g.player.left > 4) {
-				g.player.left = 0;
-			}
-
-			if (g.player.right > 4) {
-				g.player.right = 0;
-			}
-
-			if (g.computer.left > 4) {
-				g.computer.left = 0;
-			}
-
-			if (g.computer.right > 4) {
-				g.computer.right = 0;
-			}
-			return g;
-
+		}
+		if (g.player.left > 4) {
+			g.player.left = 0;
 		}
 
+		if (g.player.right > 4) {
+			g.player.right = 0;
+		}
+
+		if (g.computer.left > 4) {
+			g.computer.left = 0;
+		}
+
+		if (g.computer.right > 4) {
+			g.computer.right = 0;
+		}
 		return g;
 	}
 }
+
 
 

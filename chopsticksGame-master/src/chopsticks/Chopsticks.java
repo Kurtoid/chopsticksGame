@@ -530,22 +530,34 @@ public final class Chopsticks extends JFrame {
 	private void newCompGo() {
 		Move in = Ai3.computerGo(computer.right, computer.left, human.right, human.left);
 
-
-		if (in.cRight) {
-			if (in.pRight) {
-				human.right += computer.right;
-				System.out.println("right hit with right");
+		if (in.swapNum == 0) {
+			if (in.cRight) {
+				if (in.pRight) {
+					human.right += computer.right;
+					System.out.println("right hit with right");
+				} else {
+					human.left += computer.right;
+					System.out.println("left hit with right");
+				}
 			} else {
-				human.left += computer.right;
-				System.out.println("left hit with right");
+				if (in.pRight) {
+					human.right += computer.left;
+					System.out.println("right hit with left");
+				} else {
+					human.left += computer.left;
+					System.out.println("left hit with left");
+				}
 			}
-		} else {
-			if (in.pRight) {
-				human.right += computer.left;
-				System.out.println("right hit with left");
-			} else {
-				human.left += computer.left;
-				System.out.println("left hit with left");
+		}else{
+			System.out.println("Swapped! "+in.swapNum);
+			if (in.cRight) {
+				computer.left-=in.swapNum;
+				computer.right+=in.swapNum;
+
+			}else{
+				computer.right-=in.swapNum;
+				computer.left+=in.swapNum;
+
 			}
 		}
 	}
