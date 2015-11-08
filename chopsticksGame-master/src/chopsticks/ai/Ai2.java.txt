@@ -1,0 +1,160 @@
+package chopsticks.ai;
+
+import chopsticks.Player;
+
+import java.util.ArrayList;
+
+/**
+ * Created by kurt on 11/7/15.
+ */
+@Deprecated
+public class Ai2 {
+	static Player computer;
+	static Player player;
+
+	static int compL;
+	static int compR;
+	static int plR;
+	static int plL;
+
+	public static boolean[] computerGo(int cR, int cL, int pR, int pL) {
+
+		computer = new Player();
+		computer.left = cL;
+		computer.right = cR;
+
+		player = new Player();
+		player.left = pL;
+		player.right = pR;
+
+		compL = cL;
+		compR = cR;
+		plR = pR;
+		plL = pL;
+		int result[] = MinMax(6, true);
+		return new boolean[]{result[1] == 1, result[2] == 1};
+	}
+
+	private static int[] MinMax(int depth, boolean isComputer) {
+		System.out.println("new minmax with depth " + depth);
+		int currentScore;
+		boolean cRight = true;
+		boolean pRight = true;
+		ArrayList<boolean[]> moves = generateMoves();
+		int bestScore = (!isComputer) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+		if (moves.isEmpty() || depth == 0) {
+			bestScore = evaluate(isComputer);
+		} else {
+			System.out.println("moves: " + moves.size());
+			for (boolean[] move : moves) {
+				ApplyMove(move, isComputer);
+
+				if (!isComputer) { //false-
+					currentScore = MinMax(depth - 1, true)[0];
+					if (currentScore > bestScore) {
+						System.out.println("move assigned, score:" + currentScore);
+						System.out.println("level:" + depth);
+						bestScore = currentScore;
+						cRight = move[0];
+						pRight = move[1];
+
+					}
+				} else {
+					currentScore = MinMax(depth - 1, false)[0];
+					if (currentScore < bestScore) {
+						System.out.println("move assigned, score:" + currentScore);
+						bestScore = currentScore;
+						cRight = move[0];
+						pRight = move[1];
+
+					}
+				}
+				computer.left = compL;
+				computer.right = compR;
+				player.right = plR;
+				player.left = plL;
+				System.out.println(plR + plL);
+				//	System.out.println("reset");
+			}
+
+		}
+		return new int[]{bestScore, (cRight) ? 1 : 0, (pRight) ? 1 : 0};
+	}
+
+	public static void ApplyMove(boolean[] move, boolean isComputer) {
+		if (isComputer) {
+			if (move[0]) {
+				if (move[1]) {
+					computer.right += player.right;
+				} else {
+					computer.right += player.left;
+				}
+			} else {
+				if (move[1]) {
+					computer.left += player.right;
+				} else {
+					computer.left += player.left;
+				}
+			}
+		} else {
+			if (move[0]) {
+				if (move[1]) {
+					player.right += computer.right;
+				} else {
+					player.right += computer.left;
+				}
+			} else {
+				if (move[1]) {
+					player.left += computer.right;
+				} else {
+					player.left += computer.left;
+				}
+			}
+		}
+	}
+
+	public static int evaluate(boolean isComputer) {
+		int p = 0;
+		if (player.left + player.right == 0) {
+			System.out.println("Winning situation!");
+			p += 50;
+			return p;
+		}
+		p += (player.left + player.right);
+		if (computer.left <= 0) {
+			if (computer.right + player.left > 4) {
+				p -= 100;
+			} else if (computer.right + player.right > 4) {
+				p -= 100;
+			}
+		} else if (computer.right <=0){
+			if(computer.left+player.right>4){
+				p-=100;
+			}else if(computer.left+player.left>4){
+				p-=100;
+			}
+		}
+		return p*-1;
+	}
+
+	private static ArrayList<boolean[]> generateMoves() {
+
+		ArrayList<boolean[]> moves = new ArrayList<>();
+		if (player.left >= 1 && computer.left >= 1) {
+			moves.add(new boolean[]{false, false});
+		}
+		if (player.right >= 1 && computer.left >= 1) {
+			moves.add(new boolean[]{true, false});
+
+		}
+		if (player.left >= 1 && computer.right >= 1) {
+			moves.add(new boolean[]{false, true});
+		}
+		if (player.right >= 1 && computer.right >= 1) {
+			moves.add(new boolean[]{true, true});
+		}
+
+		return moves;
+
+	}
+}

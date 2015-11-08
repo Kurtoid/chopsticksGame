@@ -1,0 +1,148 @@
+package chopsticks.ai;
+
+import chopsticks.Chopsticks;
+import chopsticks.Player;
+
+import java.util.ArrayList;
+
+/**
+ * Created by kurt on 11/7/15.
+ * this handles computer ai code
+ */
+@Deprecated
+public class Ai {
+	static Player c;
+	static Player p;
+
+	static final boolean COMP_RIGHT = true;
+	static final boolean COMP_LEFT = false;
+	static final boolean P_RIGHT = true;
+	static final boolean P_LEFT = false;
+
+	boolean mComp;
+	boolean mP;
+
+	public static void init(Player computer, Player player) {
+		c = computer;
+		p = player;
+
+	}
+
+	public static void computerGo() {
+		// if can win
+		if (detectCanWin()) return;
+
+		Move m = MinMax(2, true);
+
+		if (m.cRight) {
+			if (m.cRight)
+				p.right += c.right;
+
+			else
+				p.right += c.left;
+
+		} else
+
+		{
+			if (m.cRight)
+				p.left += c.right;
+			else
+				p.left += c.left;
+
+		}
+		commit();
+	}
+
+	private static Move MinMax(int level, boolean player) {
+		int bestScore = (player) ? Integer.MIN_VALUE : Integer.MIN_VALUE;
+		ArrayList<Move> moves = GenerateMoves(new Game(c, p));
+		if (moves.isEmpty() || level == 0) {
+			//bestScore = Value()
+		}
+		return null;
+	}
+
+	public static ArrayList<Move> GenerateMoves(Game g) {
+		ArrayList<Move> moves = new ArrayList<>();
+		if (g.computer.left != 0 && g.player.left != 0) {
+			moves.add(new Move(false, false, g));
+		}
+		if (g.computer.left != 0 && g.player.right != 0) {
+			moves.add(new Move(false, true, g));
+		}
+		if (g.computer.right != 0 && g.player.left != 0) {
+			moves.add(new Move(true, false, g));
+		}
+		if (g.computer.right != 0 && g.player.right != 0) {
+			moves.add(new Move(true, true, g));
+		}
+
+		return moves;
+	}
+
+	public static Move best_move;
+
+	public static boolean GameWon(Game g) {
+		return ((g.player.left == 0 && g.player.right == 0) || (g.computer.left == 0 && g.computer.right == 0));
+	}
+
+
+	public static int Value(Move m) {
+		int v = m.g.player.left + m.g.player.right;
+		return v;
+	}
+
+	public static Game ApplyMove(Game g, Move m) {
+		if (m.pRight && m.cRight) {
+			g.player.right += g.computer.right;
+		}
+		if (!m.pRight && m.cRight) {
+			g.player.left += g.computer.right;
+		}
+		if (!m.pRight && !m.cRight) {
+			g.player.left += g.computer.left;
+		}
+		if (m.pRight && !m.cRight) {
+			g.player.right += g.computer.left;
+		}
+		return g;
+	}
+
+
+	public static void commit() {
+		Chopsticks.human = p;
+		Chopsticks.computer = c;
+	}
+
+	private static boolean detectCanWin() {
+		if (p.left == 0) {
+			if (p.right + c.right >= 5) {
+				attack(P_RIGHT, COMP_RIGHT);
+				return true;
+			} else if (p.right + c.left >= 5) {
+				attack(P_RIGHT, COMP_LEFT);
+				return true;
+			}
+		} else if (p.right == 0) {
+			if (p.left + c.right >= 5) {
+				attack(P_LEFT, COMP_RIGHT);
+				return true;
+			} else if (p.left + c.left >= 5) {
+				attack(P_LEFT, COMP_LEFT);
+				return true;
+			}
+		} else return false;
+		return false;
+	}
+
+	private static void attack(boolean pRight, boolean cRight) {
+		if (pRight) {
+			p.right += (cRight) ? c.right : c.left;
+		} else {
+			p.left += (cRight) ? c.right : c.left;
+		}
+	}
+
+}
+
+//@formatter:off
